@@ -23,15 +23,25 @@ public class Control implements CSProcess {
     public void run(){
 
         while (true){
+
+
             int value = channelIn.read();
 
             if(value > 0){
-                // reduce buffer
-            }
-            else if (value < 0){
-                // increase buffer
+                System.out.println("new arrival");
             }
 
+            else if (value < 0){
+                System.out.println("new departure");
+            }
+
+            int spaces = buffer.get();
+            System.out.println("old avaliable spaces:" + spaces);
+
+            spaces = spaces + value;
+            buffer.put(spaces);
+
+            System.out.println("new avaliable spaces:" + spaces);
         }
 
     }

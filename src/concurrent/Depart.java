@@ -21,6 +21,7 @@ public class Depart implements CSProcess {
     public void run(){
 
         while (true){
+
             int value = departTrigger.read();
             System.out.println("Depart");
 

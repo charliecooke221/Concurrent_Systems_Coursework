@@ -19,13 +19,13 @@ public class Arrival implements CSProcess {
     public void run(){
 
         while (true){
+
             int value = arriveTrigger.read();
             System.out.println("Arrival");
             // print space left?
 
             controllerOut.write(value);
         }
-
 
     }
 
