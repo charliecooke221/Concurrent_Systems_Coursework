@@ -1,14 +1,11 @@
 package concurrent;
 
-import org.jcsp.awt.ActiveButton;
-import org.jcsp.awt.ActiveClosingFrame;
-import org.jcsp.awt.ActiveFrame;
-import org.jcsp.lang.Any2OneChannel;
-import org.jcsp.lang.CSProcess;
-import org.jcsp.lang.ChannelOutput;
+import org.jcsp.awt.*;
+import org.jcsp.lang.*;
 import org.jcsp.util.ints.BufferInt;
 
 import java.awt.*;
+import java.util.concurrent.TimeUnit;
 
 public class BookerFrame implements CSProcess {
 
@@ -22,15 +19,22 @@ public class BookerFrame implements CSProcess {
 
 
 
-    public BookerFrame(Any2OneChannel buttChann){
+    private ActiveLabel activeLabel;
+
+
+    public BookerFrame(Any2OneChannel buttChann,BufferInt buf){
 
         buttonChannel = buttChann.out();
+        spacesBuffer = buf;
 
     }
 
     public void buildFrame(){
+        final Frame root = new Frame ("Booker");
+        root.setSize (width, height);
 
-        System.out.println("FRAME BUILDER");
+
+        ActivePanel carParkPanel = new ActivePanel();
 
         ActiveButton arriveButton = new ActiveButton();
         arriveButton = new ActiveButton(null,buttonChannel,"Arrive");
@@ -40,26 +44,58 @@ public class BookerFrame implements CSProcess {
         departButton = new ActiveButton(null,buttonChannel,"Depart");
         departButton.setBackground(Color.red);
 
-        final Frame root = new Frame ("ActiveButton Example");
+        final int nLabels = 1;
 
-        root.setSize (width, height);
-        root.setLayout (new GridLayout (2, 2));
-
-        root.add(arriveButton);
-        root.add(departButton);
-
-        root.setVisible(true);
+        One2OneChannel[] activeLabelUpdater = Channel.one2oneArray(nLabels);
 
 
 
-//        final ActiveClosingFrame activeClosingframe = new ActiveClosingFrame ("Booker");
-//        final ActiveFrame activeFrame = activeClosingframe.getActiveFrame ();
-//        activeFrame.setSize (maxWidth, height);
-//        activeFrame.pack ();
-//        activeFrame.setLocation ((maxWidth - width)/2, (maxHeight - height)/2);
-//        activeFrame.setVisible (true);
-//        activeFrame.setLayout(new GridLayout());
-//        activeFrame.toFront ();
+        //root.add(activeLabel);
+
+        carParkPanel.setLayout (new GridLayout (2, 2));
+
+
+        final ActiveLabel[] label = new ActiveLabel[1];
+        for (int i = 0; i < label.length; i++) {
+            label[i] = new ActiveLabel(activeLabelUpdater[i].in(),"Avaliable spaces: " + spacesBuffer.startGet());
+            label[i].setAlignment (Label.CENTER);
+        }
+        for (int i = 0; i < nLabels; i++) {
+            carParkPanel.add(label[i]);
+        }
+
+        carParkPanel.add(arriveButton);
+        carParkPanel.add(departButton);
+
+        carParkPanel.setVisible(true);
+
+        new Parallel (
+                new CSProcess[]{
+                        new Parallel(label),
+                        arriveButton,
+                        departButton,
+                        new CSProcess() {
+                            public void run() {
+
+                                while (true) {
+
+                                    try {
+                                        TimeUnit.SECONDS.sleep(1);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    //System.out.println("updating labels");
+                                    //System.out.println(spacesBuffer.startGet());
+                                    String spacesCount = "Avaliable spaces: " + spacesBuffer.startGet();
+                                    for (int i = 0; i < nLabels; i++) {
+                                        activeLabelUpdater[i].out().write(spacesCount);
+                                    }
+                                }
+
+                            }
+                        }
+                }).run();
     }
 
 
