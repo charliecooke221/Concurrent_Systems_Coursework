@@ -2,6 +2,7 @@ package concurrent;
 
 import org.jcsp.awt.*;
 import org.jcsp.lang.*;
+import org.jcsp.util.OverWriteOldestBuffer;
 import org.jcsp.util.ints.BufferInt;
 
 import java.awt.*;
@@ -11,10 +12,11 @@ public class BookerFrame implements CSProcess {
 
     private static final int maxWidth = 1024;
     private static final int maxHeight = 768;
-    private static final int width = 480;
-    private static final int height = 270;
+    private static final int width = 700;
+    private static final int height = 400;
 
     private ChannelOutput buttonChannel;
+
     private BufferInt spacesBuffer;
 
 
@@ -34,22 +36,56 @@ public class BookerFrame implements CSProcess {
         root.setSize (width, height);
 
 
-        ActivePanel carParkPanel = new ActivePanel();
+        ActivePanel bookingPanel = new ActivePanel(); // Booking panel
+        bookingPanel.setLayout(new BorderLayout());
+        int activeTextNum = 1;
 
+        One2OneChannel registrationFieldChan = Channel.one2one();
+
+        final ActiveTextField[] regActiveText = new ActiveTextField[activeTextNum];
+
+        for (int i = 0; i < activeTextNum; i++) {
+            regActiveText[i] = new ActiveTextField (null, registrationFieldChan.out (),"reg");
+        }
+
+        for (int i = 0; i < activeTextNum; i++) {
+            bookingPanel.add(regActiveText[i],BorderLayout.CENTER);
+        }
+
+        Any2OneChannel bookingEnterChannel = Channel.any2one(new OverWriteOldestBuffer(10));
+
+        ActiveButton enterBookingButton = new ActiveButton();
+        enterBookingButton = new ActiveButton(null,bookingEnterChannel.out(),"Enter Booking and Proceed to Carpark page");
+        enterBookingButton.setBackground(Color.green);
+        enterBookingButton.setPreferredSize(new Dimension(200,100));
+
+        Label welcomeLabel = new Label("Welcome To the Car Park Booking Page");
+        welcomeLabel.setAlignment(Label.CENTER);
+        Label enterCarRegLabel = new Label("Please enter your car registration here:");
+
+        bookingPanel.add(welcomeLabel ,BorderLayout.PAGE_START);
+        bookingPanel.add(enterCarRegLabel, BorderLayout.LINE_START);
+        bookingPanel.add(enterBookingButton,BorderLayout.PAGE_END);
+        bookingPanel.setVisible(true);
+
+
+
+
+        ActivePanel carParkPanel = new ActivePanel();       // Car park panel
+
+        One2OneChannel arriveButtConfigChan = Channel.one2one();
         ActiveButton arriveButton = new ActiveButton();
-        arriveButton = new ActiveButton(null,buttonChannel,"Arrive");
+        arriveButton = new ActiveButton(arriveButtConfigChan.in(),buttonChannel,"Arrive");
         arriveButton.setBackground(Color.green);
 
+        One2OneChannel departButtConfigChan = Channel.one2one();
         ActiveButton departButton = new ActiveButton();
-        departButton = new ActiveButton(null,buttonChannel,"Depart");
+        departButton = new ActiveButton(departButtConfigChan.in(),buttonChannel,"Depart");
         departButton.setBackground(Color.red);
 
         final int nLabels = 1;
 
         One2OneChannel[] activeLabelUpdater = Channel.one2oneArray(nLabels);
-
-
-
         //root.add(activeLabel);
 
         carParkPanel.setLayout (new GridLayout (2, 2));
@@ -67,13 +103,52 @@ public class BookerFrame implements CSProcess {
         carParkPanel.add(arriveButton);
         carParkPanel.add(departButton);
 
-        carParkPanel.setVisible(true);
+        carParkPanel.setVisible(false);
+
+
+
+        ActivePanel mainPanel = new ActivePanel();
+        mainPanel.setLayout(new CardLayout());
+        mainPanel.add(bookingPanel);
+        mainPanel.add(carParkPanel);
+
+        root.add(mainPanel);
+        root.setVisible(true);
 
         new Parallel (
                 new CSProcess[]{
                         new Parallel(label),
+                        enterBookingButton,
                         arriveButton,
                         departButton,
+                        new CSProcess() {
+                            @Override
+                            public void run() {
+                                while (true){
+                                        String regStr = (String) registrationFieldChan.in().read();
+
+                                        String arriveButtString = "Arrive " + regStr;
+                                        String departButtSting = "Depart " + regStr;
+                                        System.out.println(arriveButtString);
+
+                                        arriveButtConfigChan.out().write(arriveButtString);
+                                        departButtConfigChan.out().write(departButtSting);
+                                    }
+                                }
+                            },
+                        new CSProcess() {
+                            @Override
+                            public void run() {
+                                while (true){
+                                    String enterBookButton = (String) bookingEnterChannel.in().read();
+                                    if(enterBookButton.equals("Enter Booking and Proceed to Carpark page"))
+                                    {
+                                        bookingPanel.setVisible(false);
+                                        carParkPanel.setVisible(true);
+                                    }
+                                }
+                            }
+                        },
                         new CSProcess() {
                             public void run() {
 
@@ -92,7 +167,6 @@ public class BookerFrame implements CSProcess {
                                         activeLabelUpdater[i].out().write(spacesCount);
                                     }
                                 }
-
                             }
                         }
                 }).run();

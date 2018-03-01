@@ -28,15 +28,15 @@ public class ButtonEventReciever implements CSProcess{
 
             String event = (String) buttonChannel.read();
 
-            if(event.equals("Arrive")){
+            if(event.contains("Arrive ")){
                 System.out.println("arrive button pressed");
                 arrivetrig.write(-1);
 
             }
-            if(event.equals("Depart")){
+            if(event.contains("Depart ")){
                 System.out.println("depart button pressed");
                 departtrig.write(1);
-                String reference = "test";
+                String reference = event.replace("Depart ", "");
                 MailEvent departMailEvent = new MailEvent(reference,"Thank you for using our car park!");
                 departMail.write(departMailEvent);
                 // sent ty email
