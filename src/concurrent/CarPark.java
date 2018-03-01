@@ -38,9 +38,9 @@ public class CarPark implements CSProcess {
                 new Arrival(arriveTrigger,controllerArriveOut, controllerIn),new Depart(departTrigger,controllerDepartOut,controllerIn),new Control(controllerIn,controllerArriveOut,controllerDepartOut,spacesBuffer)
         });
 
-        System.out.println("beforerun");
+        //System.out.println("beforerun");
         carParkParallel.run();
-        System.out.println("afterrun");
+        //System.out.println("afterrun");
 
     }
 
