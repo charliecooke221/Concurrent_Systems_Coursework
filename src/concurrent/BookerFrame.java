@@ -19,6 +19,8 @@ public class BookerFrame implements CSProcess {
 
     private BufferInt spacesBuffer;
 
+    private String registrationString;
+
 
 
     private ActiveLabel activeLabel;
@@ -90,6 +92,8 @@ public class BookerFrame implements CSProcess {
 
         carParkPanel.setLayout (new GridLayout (2, 2));
 
+        Label carparkWelcomeLabel = new Label("Please use this page for checking in your arrival and departure of the car park");
+        carParkPanel.add(carparkWelcomeLabel);
 
         final ActiveLabel[] label = new ActiveLabel[1];
         for (int i = 0; i < label.length; i++) {
@@ -99,6 +103,7 @@ public class BookerFrame implements CSProcess {
         for (int i = 0; i < nLabels; i++) {
             carParkPanel.add(label[i]);
         }
+
 
         carParkPanel.add(arriveButton);
         carParkPanel.add(departButton);
@@ -125,10 +130,10 @@ public class BookerFrame implements CSProcess {
                             @Override
                             public void run() {
                                 while (true){
-                                        String regStr = (String) registrationFieldChan.in().read();
+                                        registrationString = (String) registrationFieldChan.in().read();
 
-                                        String arriveButtString = "Arrive " + regStr;
-                                        String departButtSting = "Depart " + regStr;
+                                        String arriveButtString = "Arrive " + registrationString;
+                                        String departButtSting = "Depart " + registrationString;
                                         System.out.println(arriveButtString);
 
                                         arriveButtConfigChan.out().write(arriveButtString);
@@ -145,6 +150,8 @@ public class BookerFrame implements CSProcess {
                                     {
                                         bookingPanel.setVisible(false);
                                         carParkPanel.setVisible(true);
+
+                                        buttonChannel.write("Booking " + registrationString);
                                     }
                                 }
                             }

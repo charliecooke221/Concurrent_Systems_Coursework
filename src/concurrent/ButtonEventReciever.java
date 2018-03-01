@@ -42,6 +42,12 @@ public class ButtonEventReciever implements CSProcess{
                 // sent ty email
             }
 
+            if(event.contains("Booking ")){
+                String reference = event.replace("Booking ", "");
+                MailEvent departMailEvent = new MailEvent(reference,"Thank you your car park booking has been received!");
+                departMail.write(departMailEvent);
+            }
+
 
         }
     }
