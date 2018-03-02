@@ -1,14 +1,8 @@
 package concurrent;
 
-import org.jcsp.awt.ActiveButton;
-import org.jcsp.awt.ActiveClosingFrame;
-import org.jcsp.awt.ActiveFrame;
 import org.jcsp.lang.*;
 import org.jcsp.util.OverWriteOldestBuffer;
 import org.jcsp.util.ints.BufferInt;
-
-import javax.naming.PartialResultException;
-import java.awt.*;
 
 public class Booker implements CSProcess{
 
@@ -34,7 +28,7 @@ public class Booker implements CSProcess{
         Parallel bookerParallel;
 
         bookerParallel = new Parallel( new CSProcess[]{
-                new BookerFrame(buttonOutChannel,spacesBuffer),new ButtonEventReciever(arrivetrig,departtrig,buttonOutChannel,bookingMail)
+                new BookerGUI(buttonOutChannel,spacesBuffer),new ButtonEventReciever(arrivetrig,departtrig,buttonOutChannel,bookingMail)
         });
 
         bookerParallel.run();

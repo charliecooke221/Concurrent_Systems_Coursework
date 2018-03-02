@@ -8,13 +8,14 @@ public class Depart implements CSProcess {
 
     private ChannelOutputInt controllerOut;
     private ChannelInputInt controllerIn;
+    private Control control;
 
 
-    public Depart(One2OneChannelInt trigIn,One2OneChannelInt controlIn,Any2OneChannelInt controlOut){
+    public Depart(One2OneChannelInt trigIn,One2OneChannelInt controlIn,Any2OneChannelInt controlOut,Control cont){
         departTrigger = trigIn.in();
         controllerIn = controlIn.in();
         controllerOut = controlOut.out();
-
+        control = cont;
 
 }
 
@@ -23,9 +24,11 @@ public class Depart implements CSProcess {
         while (true){
 
             int value = departTrigger.read();
-            System.out.println("Depart");
 
-            controllerOut.write(value);
+            System.out.println("CARPARK DEPART - DEPART");
+
+            control.increment();
+            System.out.println("Atomic Spaces value = " + control.getValue());
         }
 
     }

@@ -8,7 +8,7 @@ import org.jcsp.util.ints.BufferInt;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-public class BookerFrame implements CSProcess {
+public class BookerGUI implements CSProcess {
 
     private static final int maxWidth = 1024;
     private static final int maxHeight = 768;
@@ -26,7 +26,7 @@ public class BookerFrame implements CSProcess {
     private ActiveLabel activeLabel;
 
 
-    public BookerFrame(Any2OneChannel buttChann,BufferInt buf){
+    public BookerGUI(Any2OneChannel buttChann, BufferInt buf){
 
         buttonChannel = buttChann.out();
         spacesBuffer = buf;
@@ -71,8 +71,6 @@ public class BookerFrame implements CSProcess {
         bookingPanel.setVisible(true);
 
 
-
-
         ActivePanel carParkPanel = new ActivePanel();       // Car park panel
 
         One2OneChannel arriveButtConfigChan = Channel.one2one();
@@ -104,12 +102,10 @@ public class BookerFrame implements CSProcess {
             carParkPanel.add(label[i]);
         }
 
-
         carParkPanel.add(arriveButton);
         carParkPanel.add(departButton);
 
         carParkPanel.setVisible(false);
-
 
 
         ActivePanel mainPanel = new ActivePanel();
@@ -134,7 +130,7 @@ public class BookerFrame implements CSProcess {
 
                                         String arriveButtString = "Arrive " + registrationString;
                                         String departButtSting = "Depart " + registrationString;
-                                        System.out.println(arriveButtString);
+                                        //System.out.println(arriveButtString);
 
                                         arriveButtConfigChan.out().write(arriveButtString);
                                         departButtConfigChan.out().write(departButtSting);
@@ -159,7 +155,7 @@ public class BookerFrame implements CSProcess {
                         new CSProcess() {
                             public void run() {
 
-                                while (true) {
+                                while (true) {      //spaces updater
 
                                     try {
                                         TimeUnit.SECONDS.sleep(1);

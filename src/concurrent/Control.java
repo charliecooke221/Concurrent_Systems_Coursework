@@ -1,48 +1,59 @@
 package concurrent;
-import org.jcsp.lang.*;
 
-import org.jcsp.lang.CSProcess;
-import org.jcsp.util.ints.BufferInt;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class Control implements CSProcess {
+public class Control{
 
-    // channels recive space updates from arrive and depart
-    private ChannelInputInt channelIn;
-    private ChannelOutputInt arriveChannelOut;
-    private ChannelOutputInt departChannelOut;
-    private BufferInt buffer;
 
-    public Control(Any2OneChannelInt input, One2OneChannelInt arriveOut, One2OneChannelInt departOut, BufferInt  buff){
+    private AtomicInteger spaces = new AtomicInteger(30);
 
-        channelIn = input.in();
-        arriveChannelOut = arriveOut.out();
-        departChannelOut = departOut.out();
-        buffer = buff;
+
+    public void increment() {
+        spaces.incrementAndGet();
     }
 
-    public void run(){
-
-        while (true){
-
-
-            int value = channelIn.read();
-
-            if(value > 0){
-                System.out.println("new arrival");
-            }
-
-            else if (value < 0){
-                System.out.println("new departure");
-            }
-
-            int spaces = buffer.get();
-            System.out.println("old avaliable spaces:" + spaces);
-
-            spaces = spaces + value;
-            buffer.put(spaces);
-
-            System.out.println("new avaliable spaces:" + spaces);
-        }
-
+    public void decrement() {
+        spaces.decrementAndGet();
     }
+
+    public int getValue() {
+        return spaces.get();
+    }
+
+
+//    public void run(){
+//
+//       while (true){
+
+
+
+
+
+
+
+
+
+//            int value = channelIn.read();
+
+//            if(value > 0){
+//
+//                //System.out.println("CARPARK CONTROL - DEPARTURE");
+//            }
+//
+//            else if (value < 0){
+//                //System.out.println("CARPARK CONTROL - ARRIVAL");
+//            }
+
+//            int spaces = buffer.get();
+            //System.out.println("old avaliable spaces:" + spaces);
+
+            //System.out.println("CARPARK CONTROL - SPACES "+ spaces +" "+ value );
+
+//            spaces = spaces + value;
+//            buffer.put(spaces);
+
+            //System.out.println("new avaliable spaces:" + spaces);
+//        }
+//
+//    }
 }

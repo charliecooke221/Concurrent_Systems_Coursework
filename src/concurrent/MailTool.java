@@ -3,8 +3,6 @@ package concurrent;
 import org.jcsp.lang.*;
 import org.jcsp.util.Buffer;
 
-import javax.naming.PartialResultException;
-
 public class MailTool implements CSProcess {
 
     Any2OneChannel bookingMade;
@@ -25,7 +23,7 @@ public class MailTool implements CSProcess {
         Parallel mailToolParallel;
 
         mailToolParallel = new Parallel(new CSProcess[]{
-                new MailBag(bookingMade,mailsBuffer),new Uint(mailsBuffer)
+                new MailBag(bookingMade,mailsBuffer),new MailUint(mailsBuffer)
         });
 
         mailToolParallel.run();

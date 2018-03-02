@@ -29,23 +29,27 @@ public class ButtonEventReciever implements CSProcess{
             String event = (String) buttonChannel.read();
 
             if(event.contains("Arrive ")){
-                System.out.println("arrive button pressed");
+                System.out.println("BOOKER BUTTONEVENTRECIEVER - ARRIVAL");
                 arrivetrig.write(-1);
 
             }
             if(event.contains("Depart ")){
-                System.out.println("depart button pressed");
+                System.out.println("BOOKER BUTTONEVENTRECIEVER - DEPARTURE");
                 departtrig.write(1);
                 String reference = event.replace("Depart ", "");
                 MailEvent departMailEvent = new MailEvent(reference,"Thank you for using our car park!");
                 departMail.write(departMailEvent);
+//                System.out.println("BOOKER BUTTONEVENTRECIEVER - MAILSENT");
                 // sent ty email
             }
 
             if(event.contains("Booking ")){
+                //System.out.println("BOOKER BUTTONEVENTRECIEVER - BOOKING");
                 String reference = event.replace("Booking ", "");
                 MailEvent departMailEvent = new MailEvent(reference,"Thank you your car park booking has been received!");
                 departMail.write(departMailEvent);
+
+//                System.out.println("BOOKER BUTTONEVENTRECIEVER - MAILSENT");
             }
 
 

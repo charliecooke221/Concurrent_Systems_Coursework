@@ -22,7 +22,11 @@ public class MailBag implements CSProcess{ //stores mail events in buffer
 
             MailEvent mail = (MailEvent) bookingEventChannel.read();
             mailsBuffer.put(mail); // do check to see if buffer is full
-            System.out.println("MAIL RECIEVED");
+//            System.out.println("MAILTOOL MAILBAG - MAILRECIEVED");
+
+//            System.out.println("MAILTOOL MAILBAG - MAILBUFFER " + mail);
+
+
         }
     }
 

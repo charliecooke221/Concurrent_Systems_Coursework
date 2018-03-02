@@ -8,12 +8,13 @@ public class Arrival implements CSProcess {
 
     private ChannelOutputInt controllerOut;
     private ChannelInputInt controllerIn;
+    private Control control;
 
-    public Arrival(One2OneChannelInt trigIn,One2OneChannelInt controlIn,Any2OneChannelInt controlOut){
+    public Arrival(One2OneChannelInt trigIn,One2OneChannelInt controlIn,Any2OneChannelInt controlOut,Control cont){
 
-        arriveTrigger = trigIn.in();
         controllerIn = controlIn.in();
         controllerOut = controlOut.out();
+        control = cont;
     }
 
     public void run(){
@@ -21,15 +22,15 @@ public class Arrival implements CSProcess {
         while (true){
 
             int value = arriveTrigger.read();
-            System.out.println("Arrival");
-            // print space left?
 
-            controllerOut.write(value);
+            System.out.println("CARPARK ARRIVE - ARRIVAL");
+
+            control.decrement();
+            System.out.println("Atomic Spaces value = " + control.getValue());
+
+            //controllerOut.write(value);
         }
-
     }
-
-
 
 }
 
